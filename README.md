@@ -116,3 +116,7 @@ export default preview;
 </mat-chip-list>
 ```
 - Re-run `npm run storybook` to make sure the component renders properly in Storybook
+- Add cypress to the angular application `npm install cypress --save-dev`
+- Run cypress to initialize it `npx cypress open`
+  - When the cypress setup screen pops up, set up both component and e2e tests
+- 
