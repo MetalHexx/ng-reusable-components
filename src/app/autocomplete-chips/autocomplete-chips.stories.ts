@@ -12,7 +12,7 @@ type Story = StoryObj<AutocompleteChipsComponent>;
 export const Primary: Story = {
   render: () => ({
     props: {
-      label: 'AutoComplete w/Chips',
+      label: 'AutoComplete-Chips',
       primary: true,
     },
   }),
