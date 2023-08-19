@@ -1,9 +1,10 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import { AppComponent } from './app.component';
 import { AutocompleteChipsComponent } from './autocomplete-chips/autocomplete-chips.component';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { MaterialSharedModule } from './material-shared/material-shared.module';
 
 @NgModule({
   declarations: [
@@ -12,7 +13,8 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
   ],
   imports: [
     BrowserModule,
-    BrowserAnimationsModule
+    BrowserAnimationsModule,
+    MaterialSharedModule
   ],
   providers: [],
   bootstrap: [AppComponent]
