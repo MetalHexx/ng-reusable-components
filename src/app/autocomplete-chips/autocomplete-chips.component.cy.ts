@@ -85,6 +85,7 @@ describe('AutoCompleteChipsComponent', () => {
     cy.customMount(AutocompleteChipsComponent, props('Placeholder', sampleItems));
 
     cy.get('[data-testid="autocomplete-input"]').type('Test');
+    cy.get('mat-option').should('have.length', 3);
     cy.get('mat-option:visible').first().click();
     cy.get('[data-testid="autocomplete-input"]').type('Test');
     cy.get('mat-option').should('have.length', 2);
