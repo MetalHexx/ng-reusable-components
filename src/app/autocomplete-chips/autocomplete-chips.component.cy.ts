@@ -66,7 +66,7 @@ describe('AutoCompleteChipsComponent', () => {
     cy.get('mat-option').should('not.exist');
   });
 
-  it('filters items when matches are found', () => {
+  it('filters outitems when matches are found', () => {
     cy.customMount(AutocompleteChipsComponent, props('Placeholder', sampleItems));
     cy.get('[data-testid="autocomplete-input"]').type('Test1');
     cy.get('mat-option').should('have.length', 1);
@@ -79,6 +79,15 @@ describe('AutoCompleteChipsComponent', () => {
     cy.get('mat-option:visible').first().click();
     cy.get('mat-option').should('not.exist');
     cy.get('[data-testid="chip-text"]').should('have.text', 'Test1');
+  });
+
+  it('removes items from autocomplete when items are selected', () => {
+    cy.customMount(AutocompleteChipsComponent, props('Placeholder', sampleItems));
+
+    cy.get('[data-testid="autocomplete-input"]').type('Test');
+    cy.get('mat-option:visible').first().click();
+    cy.get('[data-testid="autocomplete-input"]').type('Test');
+    cy.get('mat-option').should('have.length', 2);
   });
 
   it('removes chips when remove icon is clicked', () => {
@@ -105,5 +114,5 @@ describe('AutoCompleteChipsComponent', () => {
       .should('have.callCount', 1)
       .its('firstCall.args.0')
       .should('deep.equal', [{ id: '1', display: 'Test1', value: 'Value1' }]);
-});
+  });
 });
