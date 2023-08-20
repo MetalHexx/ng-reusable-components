@@ -131,7 +131,11 @@ describe('AutoCompleteChipsComponent', () => {
 });
 ```
 - You'll notice the component renders just text instead of using Angular material
-- Add a styles.css file to your /.cypress folder with the following contents
+- Add a styles.css file to your /.cypress folder with the following contents.  This will reference the styles.scss file from the angular app.
+```css
+@import "../src/styles.scss";
+```
+- There are some styles being pulled in from index.html in the angular app.  Let's remove them from index.html and move them to the apps styles.scss file.  Your styles.scss file should have the following content.
 ```css
 @import "~@angular/material/prebuilt-themes/indigo-pink.css";
 @import "https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap";
@@ -198,4 +202,6 @@ module.exports = (on, config) => {
 };
 ```
 - Add these dependencies to support webpack css file loading `npm install --save-dev style-loader css-loader sass-loader url-loader`
+- Run `npx cypress open` again and run the test.  It should pass and render properly with the expected angular material styling
+- 
 
