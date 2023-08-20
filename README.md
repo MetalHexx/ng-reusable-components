@@ -119,4 +119,83 @@ export default preview;
 - Add cypress to the angular application `npm install cypress --save-dev`
 - Run cypress to initialize it `npx cypress open`
   - When the cypress setup screen pops up, set up both component and e2e tests
-- 
+- Create a new component test file `autocomplete-chips.component.cy.ts` in the folder where the component resides
+- Write a test to verify that the component mounts
+```javascript
+import { AutocompleteChipsComponent } from "./autocomplete-chips.component";
+
+describe('AutoCompleteChipsComponent', () => {
+  it('can mount', () => {
+    cy.mount(AutocompleteChipsComponent)
+  });
+});
+```
+- You'll notice the component renders just text instead of using Angular material
+- Add a styles.css file to your /.cypress folder with the following contents
+```css
+@import "~@angular/material/prebuilt-themes/indigo-pink.css";
+@import "https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap";
+@import "https://fonts.googleapis.com/icon?family=Material+Icons";
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+```
+- Change your test to import the MaterialsSharedModule and add a beforeEach to ensure the module is loaded before each test
+
+```javascript
+import { mount } from "cypress/angular";
+import { AutocompleteChipsComponent } from "./autocomplete-chips.component";
+import { MaterialSharedModule } from "../material-shared/material-shared.module";
+
+describe('AutoCompleteChipsComponent', () => {
+  beforeEach(() => {
+    mount(AutocompleteChipsComponent, {
+      imports: [MaterialSharedModule],
+    });
+  });
+
+  it('can mount', () => {
+    cy.mount(AutocompleteChipsComponent)
+  });
+});
+```
+
+- Add a file `.cypress/webpack.config.js` with the following content
+```javascript
+module.exports = {
+  module: {
+    rules: [
+      {
+        test: /\.scss$|\.css$/,
+        use: [
+          'style-loader', // This will inject styles into the DOM
+          'css-loader',
+          'sass-loader'
+        ]
+      },
+      {
+        test: /\.(jpg|jpeg|png|woff|woff2|eot|ttf|svg)$/,
+        use: [
+          { loader: 'url-loader?limit=100000' }
+        ]
+      }
+    ]
+  }
+};
+```
+- Add a file `.cypress/plugins/index.js` with the following content
+```javascript
+const webpack = require('@cypress/webpack-preprocessor');
+
+module.exports = (on, config) => {
+  const options = {
+    ...config,
+    webpackOptions: require('../cypress/webpack.config'),
+  };
+
+  on('file:preprocessor', webpack(options));
+
+  return config;
+};
+```
+- Add these dependencies to support webpack css file loading `npm install --save-dev style-loader css-loader sass-loader url-loader`
+
