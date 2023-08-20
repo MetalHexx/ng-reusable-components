@@ -5,15 +5,17 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AppComponent } from './app.component';
 import { AutocompleteChipsComponent } from './autocomplete-chips/autocomplete-chips.component';
 import { MaterialSharedModule } from './material-shared/material-shared.module';
+import { ReactiveFormsModule } from '@angular/forms';
 
 @NgModule({
   declarations: [
     AppComponent,
-    AutocompleteChipsComponent
+    AutocompleteChipsComponent,
   ],
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
+    ReactiveFormsModule,
     MaterialSharedModule
   ],
   providers: [],
