@@ -203,5 +203,3 @@ module.exports = (on, config) => {
 ```
 - Add these dependencies to support webpack css file loading `npm install --save-dev style-loader css-loader sass-loader url-loader`
 - Run `npx cypress open` again and run the test.  It should pass and render properly with the expected angular material styling
-- 
-
