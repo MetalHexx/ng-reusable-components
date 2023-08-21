@@ -72,13 +72,13 @@ describe('AutoCompleteChipsComponent', () => {
     cy.get('mat-option').should('have.length', 1);
   });
 
-  it('hides auto complete when an item is selected from it', () => {
+  it('hides auto complete and empties input when an item is selected', () => {
     cy.customMount(AutocompleteChipsComponent, props('Placeholder', sampleItems));
-
     cy.get('[data-testid="autocomplete-input"]').type('Test');
     cy.get('mat-option:visible').first().click();
     cy.get('mat-option').should('not.exist');
     cy.get('[data-testid="chip-text"]').should('have.text', 'Test1');
+    cy.get('[data-testid="autocomplete-input"]').should('have.text', '');
   });
 
   it('removes items from autocomplete when items are selected', () => {
@@ -107,13 +107,34 @@ describe('AutoCompleteChipsComponent', () => {
     cy.get('[data-testid="chip-text"]').should('not.exist');
   });
 
+  it('emits less selected items when when remove icon is clicked', () => {
+    cy.customMount(AutocompleteChipsComponent, props('Placeholder', sampleItems));
+    cy.get('[data-testid="autocomplete-input"]').focus()
+    cy.get('mat-option:visible').first().click();
+    cy.get('[data-testid="autocomplete-input"]').focus()
+    cy.get('mat-option:visible').first().click();
+    cy.get('[data-testid="chip-remove"]').first().click();
+
+    cy.get('@selectedItemsChange')
+      .should('have.callCount', 3)
+      .its('thirdCall.args.0')
+      .should('deep.equal', [
+        { id: '2', display: 'Test2', value: 'Value2' }
+      ]);
+  });
+
   it('emits selected items when an item is selected from the autocomplete list', () => {
     cy.customMount(AutocompleteChipsComponent, props('Placeholder', sampleItems));
     cy.get('[data-testid="autocomplete-input"]').type('Test');
     cy.get('mat-option:visible').first().click();
+    cy.get('[data-testid="autocomplete-input"]').type('Test');
+    cy.get('mat-option:visible').first().click();
     cy.get('@selectedItemsChange')
-      .should('have.callCount', 1)
-      .its('firstCall.args.0')
-      .should('deep.equal', [{ id: '1', display: 'Test1', value: 'Value1' }]);
+      .should('have.callCount', 2)
+      .its('secondCall.args.0')
+      .should('deep.equal', [
+        { id: '1', display: 'Test1', value: 'Value1' },
+        { id: '2', display: 'Test2', value: 'Value2' }
+      ]);
   });
 });
