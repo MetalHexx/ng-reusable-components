@@ -1,8 +1,8 @@
 # NgReusableComponents
 
 ## To Run Demos
-- Cypress 'npx cypress open'
-- Storybook 'npm run storybook'
+- Cypress `npx cypress open`
+- Storybook `npm run storybook`
 
 ## Notes taken while producing the repo...Work in progress.
 
