@@ -1,6 +1,6 @@
 # NgReusableComponents
 
-## To Run
+## To Run Demos
 - Cypress 'npx cypress open'
 - Storybook 'npm run storybook'
 
