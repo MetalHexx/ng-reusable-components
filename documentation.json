@@ -2,6 +2,70 @@
     "pipes": [],
     "interfaces": [
         {
+            "name": "AutoCompleteOption",
+            "id": "interface-AutoCompleteOption-f8dd558a7a869a0383cb4c77ef46493bf2f2998f306051240806a8ffc7d34e9c096b25b7b158bfab60aad6d3c284e159ac21db27bce85abca7d2e50e130303c1",
+            "file": "src/app/autocomplete-chips/autocomplete-chips.component.ts",
+            "deprecated": false,
+            "deprecationMessage": "",
+            "type": "interface",
+            "sourceCode": "import { Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';\r\nimport { FormControl } from '@angular/forms';\r\nimport { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';\r\n\r\nexport interface AutoCompleteOption<T> {\r\n  id: string,\r\n  display: string;\r\n  value: T;\r\n}\r\n\r\n@Component({\r\n  selector: 'app-autocomplete-chips',\r\n  templateUrl: './autocomplete-chips.component.html',\r\n  styleUrls: ['./autocomplete-chips.component.scss']\r\n})\r\nexport class AutocompleteChipsComponent<T> {\r\n\r\n  @Input() items: AutoCompleteOption<T>[] = [];\r\n  @Input() placeholder: string = \"\";\r\n  @Output() selectedItemsChange = new EventEmitter<AutoCompleteOption<T>[]>();\r\n\r\n  @ViewChild('inputElem') inputElem!: ElementRef;\r\n  itemCtrl = new FormControl();\r\n  selectedItems: AutoCompleteOption<T>[] = [];\r\n\r\n  get itemsMatchingUnselectedKeys(): AutoCompleteOption<T>[] {\r\n    const filterValue = this.itemCtrl.value?.toLowerCase() || '';\r\n\r\n    return this.items.filter(item =>\r\n      item.display.toLowerCase().includes(filterValue)\r\n        && !this.selectedItems.map(selectedItem => selectedItem.id).includes(item.id)\r\n    );\r\n  }\r\n\r\n  onSelect(event: MatAutocompleteSelectedEvent) {\r\n    const selectedItem = event.option.value as AutoCompleteOption<T>;\r\n    this.selectedItems.push(selectedItem);\r\n    this.selectedItemsChange.emit(this.selectedItems);\r\n    this.itemCtrl.reset();\r\n    this.inputElem.nativeElement.value = '';\r\n  }\r\n\r\n  removeItem(itemValue: AutoCompleteOption<T>) {\r\n    const index = this.selectedItems.indexOf(itemValue);\r\n    this.selectedItems.splice(index, 1);\r\n    this.selectedItemsChange.emit(this.selectedItems);\r\n  }\r\n}\r\n",
+            "properties": [
+                {
+                    "name": "display",
+                    "deprecated": false,
+                    "deprecationMessage": "",
+                    "type": "string",
+                    "optional": false,
+                    "description": "",
+                    "line": 7
+                },
+                {
+                    "name": "id",
+                    "deprecated": false,
+                    "deprecationMessage": "",
+                    "type": "string",
+                    "optional": false,
+                    "description": "",
+                    "line": 6
+                },
+                {
+                    "name": "value",
+                    "deprecated": false,
+                    "deprecationMessage": "",
+                    "type": "T",
+                    "optional": false,
+                    "description": "",
+                    "line": 8
+                }
+            ],
+            "indexSignatures": [],
+            "kind": 168,
+            "methods": []
+        },
+        {
+            "name": "Chainable",
+            "id": "interface-Chainable-8b448cf2c6e684a444e7b23b1b29437b250256cda32e4f8955b149a2fed71f5c180635b58aaabc74a623ade9835af6eb5d25fc2bb1bc1e70716b8cea3dbd088e",
+            "file": "src/app/autocomplete-chips/autocomplete-chips.component.cy.ts",
+            "deprecated": false,
+            "deprecationMessage": "",
+            "type": "interface",
+            "sourceCode": "import { MountConfig, createOutputSpy, mount } from \"cypress/angular\";\r\nimport { AutoCompleteOption, AutocompleteChipsComponent } from \"./autocomplete-chips.component\";\r\nimport { MaterialSharedModule } from \"../material-shared/material-shared.module\";\r\nimport { ReactiveFormsModule } from \"@angular/forms\";\r\nimport { BrowserAnimationsModule } from \"@angular/platform-browser/animations\";\r\nimport { Type } from \"@angular/core\";\r\nimport { MatIconModule } from '@angular/material/icon';\r\n\r\ndeclare global {\r\n  namespace Cypress {\r\n    interface Chainable {\r\n      customMount: typeof customMount\r\n    }\r\n  }\r\n}\r\n\r\nconst imports = [MaterialSharedModule, ReactiveFormsModule, BrowserAnimationsModule];\r\n\r\nfunction customMount<T>(component: string | Type<T>, config?: MountConfig<T>) {\r\n  if (!config) {\r\n    config = { imports }\r\n  } else {\r\n    config.imports = [...(config?.imports || []), ...imports]\r\n  }\r\n  return mount<T>(component, config);\r\n}\r\n\r\nfunction props(placeholder: string, items: AutoCompleteOption<any>[] = []) {\r\n  return {\r\n    componentProperties: {\r\n      placeholder: placeholder,\r\n      items: items,\r\n      selectedItemsChange: createOutputSpy('selectedItemsChange')\r\n    }\r\n  }\r\n}\r\n\r\nCypress.Commands.add('customMount', customMount);\r\n\r\nconst sampleItems = [\r\n  { id: '1', display: 'Test1', value: 'Value1' },\r\n  { id: '2', display: 'Test2', value: 'Value2' },\r\n  { id: '3', display: 'Test3', value: 'Value3' }\r\n];\r\n\r\ndescribe('AutoCompleteChipsComponent', () => {\r\n\r\n  it('shows the specified placeholder when input is empty', () => {\r\n    cy.customMount(AutocompleteChipsComponent, props('Placeholder', sampleItems));\r\n    cy.get('[data-testid=\"autocomplete-input\"]').should('have.attr', 'placeholder', 'Placeholder');\r\n  });\r\n\r\n  it('displays all autocomplete options when focusing on input', () => {\r\n    cy.customMount(AutocompleteChipsComponent, props('Placeholder', sampleItems));\r\n    cy.get('[data-testid=\"autocomplete-input\"]').focus();\r\n    cy.get('mat-option').should('be.visible');\r\n    cy.get('mat-option').should('have.length', 3);\r\n  });\r\n\r\n  it('should hide autocomplete items on blur', () => {\r\n    cy.customMount(AutocompleteChipsComponent, props('Placeholder', sampleItems));\r\n    cy.get('[data-testid=\"autocomplete-input\"]').focus();\r\n    cy.get('mat-option').should('be.visible');\r\n    cy.get('mat-option').should('have.length', 3);\r\n    cy.get('body').click();\r\n    cy.get('mat-option').should('not.exist');\r\n  });\r\n\r\n  it('filters outitems when matches are found', () => {\r\n    cy.customMount(AutocompleteChipsComponent, props('Placeholder', sampleItems));\r\n    cy.get('[data-testid=\"autocomplete-input\"]').type('Test1');\r\n    cy.get('mat-option').should('have.length', 1);\r\n  });\r\n\r\n  it('hides auto complete and empties input when an item is selected', () => {\r\n    cy.customMount(AutocompleteChipsComponent, props('Placeholder', sampleItems));\r\n    cy.get('[data-testid=\"autocomplete-input\"]').type('Test');\r\n    cy.get('mat-option:visible').first().click();\r\n    cy.get('mat-option').should('not.exist');\r\n    cy.get('[data-testid=\"chip-text\"]').should('have.text', 'Test1');\r\n    cy.get('[data-testid=\"autocomplete-input\"]').should('have.text', '');\r\n  });\r\n\r\n  it('removes items from autocomplete when items are selected', () => {\r\n    cy.customMount(AutocompleteChipsComponent, props('Placeholder', sampleItems));\r\n\r\n    cy.get('[data-testid=\"autocomplete-input\"]').type('Test');\r\n    cy.get('mat-option').should('have.length', 3);\r\n    cy.get('mat-option:visible').first().click();\r\n    cy.get('[data-testid=\"autocomplete-input\"]').type('Test');\r\n    cy.get('mat-option').should('have.length', 2);\r\n  });\r\n\r\n  it('removes chips when remove icon is clicked', () => {\r\n    cy.customMount(AutocompleteChipsComponent, props('Placeholder', sampleItems));\r\n    cy.get('[data-testid=\"autocomplete-input\"]').type('Test');\r\n    cy.get('mat-option:visible').first().click();\r\n    cy.get('[data-testid=\"chip-remove\"]').click();\r\n    cy.get('[data-testid=\"chip-text\"]').should('not.exist');\r\n  });\r\n\r\n  it('removes chips when backspace is entered twice on a blank input', () => {\r\n    cy.customMount(AutocompleteChipsComponent, props('Placeholder', sampleItems));\r\n    cy.get('[data-testid=\"autocomplete-input\"]').type('Test');\r\n    cy.get('mat-option:visible').first().click();\r\n    cy.get('[data-testid=\"autocomplete-input\"]').type('{backspace}{backspace}');\r\n    cy.get('[data-testid=\"chip-text\"]').should('not.exist');\r\n  });\r\n\r\n  it('emits less selected items when when remove icon is clicked', () => {\r\n    cy.customMount(AutocompleteChipsComponent, props('Placeholder', sampleItems));\r\n    cy.get('[data-testid=\"autocomplete-input\"]').focus()\r\n    cy.get('mat-option:visible').first().click();\r\n    cy.get('[data-testid=\"autocomplete-input\"]').focus()\r\n    cy.get('mat-option:visible').first().click();\r\n    cy.get('[data-testid=\"chip-remove\"]').first().click();\r\n\r\n    cy.get('@selectedItemsChange')\r\n      .should('have.callCount', 3)\r\n      .its('thirdCall.args.0')\r\n      .should('deep.equal', [\r\n        { id: '2', display: 'Test2', value: 'Value2' }\r\n      ]);\r\n  });\r\n\r\n  it('emits selected items when an item is selected from the autocomplete list', () => {\r\n    cy.customMount(AutocompleteChipsComponent, props('Placeholder', sampleItems));\r\n    cy.get('[data-testid=\"autocomplete-input\"]').type('Test');\r\n    cy.get('mat-option:visible').first().click();\r\n    cy.get('[data-testid=\"autocomplete-input\"]').type('Test');\r\n    cy.get('mat-option:visible').first().click();\r\n    cy.get('@selectedItemsChange')\r\n      .should('have.callCount', 2)\r\n      .its('secondCall.args.0')\r\n      .should('deep.equal', [\r\n        { id: '1', display: 'Test1', value: 'Value1' },\r\n        { id: '2', display: 'Test2', value: 'Value2' }\r\n      ]);\r\n  });\r\n});\r\n",
+            "properties": [
+                {
+                    "name": "customMount",
+                    "deprecated": false,
+                    "deprecationMessage": "",
+                    "type": "",
+                    "optional": false,
+                    "description": "",
+                    "line": 12
+                }
+            ],
+            "indexSignatures": [],
+            "kind": 168,
+            "methods": []
+        },
+        {
             "name": "User",
             "id": "interface-User-9c7e5f1bbbab702cb032307d130876cb68969b0cd4eedef32a0c8cad8081a54e5f8f577ed6ad4539c1b99a1d246cb34031d198c2ea8eba440e64e91b14f01fdc",
             "file": "src/stories/User.ts",
@@ -76,7 +140,7 @@
         },
         {
             "name": "AutocompleteChipsComponent",
-            "id": "component-AutocompleteChipsComponent-c7727c2b527d53e995b4af0a8ab28097fd19a483563d942c970ea4d55babcaad8d4abc5b7861ed9b8cfd5b141848bbbedfd8f9ae33325a407cf022831a8cfc28",
+            "id": "component-AutocompleteChipsComponent-f8dd558a7a869a0383cb4c77ef46493bf2f2998f306051240806a8ffc7d34e9c096b25b7b158bfab60aad6d3c284e159ac21db27bce85abca7d2e50e130303c1",
             "file": "src/app/autocomplete-chips/autocomplete-chips.component.ts",
             "encapsulation": [],
             "entryComponents": [],
@@ -93,19 +157,132 @@
             ],
             "viewProviders": [],
             "hostDirectives": [],
-            "inputsClass": [],
-            "outputsClass": [],
-            "propertiesClass": [],
+            "inputsClass": [
+                {
+                    "name": "items",
+                    "defaultValue": "[]",
+                    "deprecated": false,
+                    "deprecationMessage": "",
+                    "line": 18,
+                    "type": "AutoCompleteOption<T>[]",
+                    "decorators": []
+                },
+                {
+                    "name": "placeholder",
+                    "defaultValue": "\"\"",
+                    "deprecated": false,
+                    "deprecationMessage": "",
+                    "line": 19,
+                    "type": "string",
+                    "decorators": []
+                }
+            ],
+            "outputsClass": [
+                {
+                    "name": "selectedItemsChange",
+                    "defaultValue": "new EventEmitter<AutoCompleteOption<T>[]>()",
+                    "deprecated": false,
+                    "deprecationMessage": "",
+                    "line": 20,
+                    "type": "EventEmitter"
+                }
+            ],
+            "propertiesClass": [
+                {
+                    "name": "inputElem",
+                    "deprecated": false,
+                    "deprecationMessage": "",
+                    "type": "ElementRef",
+                    "optional": false,
+                    "description": "",
+                    "line": 22,
+                    "decorators": [
+                        {
+                            "name": "ViewChild",
+                            "stringifiedArguments": "'inputElem'"
+                        }
+                    ],
+                    "modifierKind": [
+                        167
+                    ]
+                },
+                {
+                    "name": "itemCtrl",
+                    "defaultValue": "new FormControl()",
+                    "deprecated": false,
+                    "deprecationMessage": "",
+                    "type": "",
+                    "optional": false,
+                    "description": "",
+                    "line": 23
+                },
+                {
+                    "name": "selectedItems",
+                    "defaultValue": "[]",
+                    "deprecated": false,
+                    "deprecationMessage": "",
+                    "type": "AutoCompleteOption<T>[]",
+                    "optional": false,
+                    "description": "",
+                    "line": 24
+                }
+            ],
             "methodsClass": [
                 {
-                    "name": "ngOnInit",
-                    "args": [],
+                    "name": "onSelect",
+                    "args": [
+                        {
+                            "name": "event",
+                            "type": "MatAutocompleteSelectedEvent",
+                            "deprecated": false,
+                            "deprecationMessage": ""
+                        }
+                    ],
                     "optional": false,
                     "returnType": "void",
                     "typeParameters": [],
-                    "line": 12,
+                    "line": 35,
                     "deprecated": false,
-                    "deprecationMessage": ""
+                    "deprecationMessage": "",
+                    "jsdoctags": [
+                        {
+                            "name": "event",
+                            "type": "MatAutocompleteSelectedEvent",
+                            "deprecated": false,
+                            "deprecationMessage": "",
+                            "tagName": {
+                                "text": "param"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "removeItem",
+                    "args": [
+                        {
+                            "name": "itemValue",
+                            "type": "AutoCompleteOption<T>",
+                            "deprecated": false,
+                            "deprecationMessage": ""
+                        }
+                    ],
+                    "optional": false,
+                    "returnType": "void",
+                    "typeParameters": [],
+                    "line": 43,
+                    "deprecated": false,
+                    "deprecationMessage": "",
+                    "jsdoctags": [
+                        {
+                            "name": "itemValue",
+                            "type": "AutoCompleteOption<T>",
+                            "deprecated": false,
+                            "deprecationMessage": "",
+                            "tagName": {
+                                "text": "param"
+                            }
+                        }
+                    ]
                 }
             ],
             "deprecated": false,
@@ -117,7 +294,7 @@
             "description": "",
             "rawdescription": "\n",
             "type": "component",
-            "sourceCode": "import { Component, OnInit } from '@angular/core';\r\n\r\n@Component({\r\n  selector: 'app-autocomplete-chips',\r\n  templateUrl: './autocomplete-chips.component.html',\r\n  styleUrls: ['./autocomplete-chips.component.scss']\r\n})\r\nexport class AutocompleteChipsComponent implements OnInit {\r\n\r\n  constructor() { }\r\n\r\n  ngOnInit(): void {\r\n  }\r\n\r\n}\r\n",
+            "sourceCode": "import { Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';\r\nimport { FormControl } from '@angular/forms';\r\nimport { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';\r\n\r\nexport interface AutoCompleteOption<T> {\r\n  id: string,\r\n  display: string;\r\n  value: T;\r\n}\r\n\r\n@Component({\r\n  selector: 'app-autocomplete-chips',\r\n  templateUrl: './autocomplete-chips.component.html',\r\n  styleUrls: ['./autocomplete-chips.component.scss']\r\n})\r\nexport class AutocompleteChipsComponent<T> {\r\n\r\n  @Input() items: AutoCompleteOption<T>[] = [];\r\n  @Input() placeholder: string = \"\";\r\n  @Output() selectedItemsChange = new EventEmitter<AutoCompleteOption<T>[]>();\r\n\r\n  @ViewChild('inputElem') inputElem!: ElementRef;\r\n  itemCtrl = new FormControl();\r\n  selectedItems: AutoCompleteOption<T>[] = [];\r\n\r\n  get itemsMatchingUnselectedKeys(): AutoCompleteOption<T>[] {\r\n    const filterValue = this.itemCtrl.value?.toLowerCase() || '';\r\n\r\n    return this.items.filter(item =>\r\n      item.display.toLowerCase().includes(filterValue)\r\n        && !this.selectedItems.map(selectedItem => selectedItem.id).includes(item.id)\r\n    );\r\n  }\r\n\r\n  onSelect(event: MatAutocompleteSelectedEvent) {\r\n    const selectedItem = event.option.value as AutoCompleteOption<T>;\r\n    this.selectedItems.push(selectedItem);\r\n    this.selectedItemsChange.emit(this.selectedItems);\r\n    this.itemCtrl.reset();\r\n    this.inputElem.nativeElement.value = '';\r\n  }\r\n\r\n  removeItem(itemValue: AutoCompleteOption<T>) {\r\n    const index = this.selectedItems.indexOf(itemValue);\r\n    this.selectedItems.splice(index, 1);\r\n    this.selectedItemsChange.emit(this.selectedItems);\r\n  }\r\n}\r\n",
             "assetsDirs": [],
             "styleUrlsData": [
                 {
@@ -126,18 +303,18 @@
                 }
             ],
             "stylesData": "",
-            "constructorObj": {
-                "name": "constructor",
-                "description": "",
-                "deprecated": false,
-                "deprecationMessage": "",
-                "args": [],
-                "line": 8
+            "accessors": {
+                "itemsMatchingUnselectedKeys": {
+                    "name": "itemsMatchingUnselectedKeys",
+                    "getSignature": {
+                        "name": "itemsMatchingUnselectedKeys",
+                        "type": "[]",
+                        "returnType": "AutoCompleteOption[]",
+                        "line": 26
+                    }
+                }
             },
-            "implements": [
-                "OnInit"
-            ],
-            "templateData": "<mat-chip-list aria-label=\"Fruit selection\">\r\n  <mat-chip>Apple</mat-chip>\r\n  <mat-chip>Orange</mat-chip>\r\n  <mat-chip>Banana</mat-chip>\r\n</mat-chip-list>\r\n"
+            "templateData": "<mat-form-field class=\"example-full-width\">\r\n  <div class=\"flex-container\">\r\n    <mat-chip-list #chipList inline=\"true\" aria-label=\"Selected items\">\r\n      <mat-chip *ngFor=\"let item of selectedItems\" [removable]=\"true\" (removed)=\"removeItem(item)\">\r\n        <span data-testid=\"chip-text\">{{ item.display }}</span>\r\n        <mat-icon data-testid=\"chip-remove\" matChipRemove>cancel</mat-icon>\r\n      </mat-chip>\r\n    </mat-chip-list>\r\n    <input data-testid=\"autocomplete-input\" #inputElem type=\"text\" placeholder=\"{{placeholder}}\" matInput [matAutocomplete]=\"auto\" [formControl]=\"itemCtrl\" [matChipInputFor]=\"chipList\">\r\n  </div>\r\n\r\n  <mat-autocomplete #auto=\"matAutocomplete\" (optionSelected)=\"onSelect($event)\">\r\n    <mat-option *ngFor=\"let item of itemsMatchingUnselectedKeys\" [value]=\"item\">\r\n      {{item.display}}\r\n    </mat-option>\r\n  </mat-autocomplete>\r\n</mat-form-field>\r\n"
         },
         {
             "name": "ButtonComponent",
@@ -434,13 +611,13 @@
     "modules": [
         {
             "name": "AppModule",
-            "id": "module-AppModule-1c09c5b0383fc32c29c5415940bf64ddba06f4c65d55ce3bca4072f696c1ddc70f04b519193e056591b52d359d409586205ac684ab4b3b8b8336bf66bc22ce27",
+            "id": "module-AppModule-1afdce22650dfd6f2701194a7cb09e76fcf2e669faac5644a04b6379612044ea61844e9f4709befd5bf962aa8d507545b0c2bde6dae9fd935968d6e234f41b59",
             "description": "",
             "deprecationMessage": "",
             "deprecated": false,
             "file": "src/app/app.module.ts",
             "methods": [],
-            "sourceCode": "import { NgModule } from '@angular/core';\r\nimport { BrowserModule } from '@angular/platform-browser';\r\nimport { BrowserAnimationsModule } from '@angular/platform-browser/animations';\r\n\r\nimport { AppComponent } from './app.component';\r\nimport { AutocompleteChipsComponent } from './autocomplete-chips/autocomplete-chips.component';\r\nimport { MaterialSharedModule } from './material-shared/material-shared.module';\r\n\r\n@NgModule({\r\n  declarations: [\r\n    AppComponent,\r\n    AutocompleteChipsComponent\r\n  ],\r\n  imports: [\r\n    BrowserModule,\r\n    BrowserAnimationsModule,\r\n    MaterialSharedModule\r\n  ],\r\n  providers: [],\r\n  bootstrap: [AppComponent]\r\n})\r\nexport class AppModule { }\r\n",
+            "sourceCode": "import { NgModule } from '@angular/core';\r\nimport { BrowserModule } from '@angular/platform-browser';\r\nimport { BrowserAnimationsModule } from '@angular/platform-browser/animations';\r\n\r\nimport { AppComponent } from './app.component';\r\nimport { AutocompleteChipsComponent } from './autocomplete-chips/autocomplete-chips.component';\r\nimport { MaterialSharedModule } from './material-shared/material-shared.module';\r\nimport { ReactiveFormsModule } from '@angular/forms';\r\n\r\n@NgModule({\r\n  declarations: [\r\n    AppComponent,\r\n    AutocompleteChipsComponent,\r\n  ],\r\n  imports: [\r\n    BrowserModule,\r\n    BrowserAnimationsModule,\r\n    ReactiveFormsModule,\r\n    MaterialSharedModule\r\n  ],\r\n  providers: [],\r\n  bootstrap: [AppComponent]\r\n})\r\nexport class AppModule { }\r\n",
             "children": [
                 {
                     "type": "providers",
@@ -485,13 +662,13 @@
         },
         {
             "name": "MaterialSharedModule",
-            "id": "module-MaterialSharedModule-c75eb96050836eaf70292c495f7147eb018f50722bd64bc87ae638e984a6c15fc58eb8d1a5a856b91dee54e4557cb9b2778651532201b56a5192aa07b8e2d4d2",
+            "id": "module-MaterialSharedModule-f6a7d46b0c0a813bbc69d1532cea3fa611622c6087f13ea71bc1c2cdf7c820a55a3304d0e9ddd03a87b3dee57266df32a7eedbed00e7a178acb07ab4509cbd49",
             "description": "",
             "deprecationMessage": "",
             "deprecated": false,
             "file": "src/app/material-shared/material-shared.module.ts",
             "methods": [],
-            "sourceCode": "import { NgModule } from '@angular/core';\nimport { MatButtonModule } from '@angular/material/button';\nimport { MatInputModule } from '@angular/material/input';\nimport { MatChipsModule } from '@angular/material/chips';\n\n@NgModule({\n  imports: [\n    MatButtonModule,\n    MatInputModule,\n    MatChipsModule,\n  ],\n  exports: [\n    MatButtonModule,\n    MatInputModule,\n    MatChipsModule,\n  ]\n})\nexport class MaterialSharedModule { }\n",
+            "sourceCode": "import { NgModule } from '@angular/core';\nimport { MatButtonModule } from '@angular/material/button';\nimport { MatInputModule } from '@angular/material/input';\nimport { MatChipsModule } from '@angular/material/chips';\nimport { MatAutocompleteModule } from '@angular/material/autocomplete';\nimport { MatIconModule } from '@angular/material/icon';\n\n@NgModule({\n  imports: [\n    MatButtonModule,\n    MatInputModule,\n    MatChipsModule,\n    MatAutocompleteModule,\n    MatIconModule\n  ],\n  exports: [\n    MatButtonModule,\n    MatInputModule,\n    MatChipsModule,\n    MatAutocompleteModule,\n    MatIconModule\n  ]\n})\nexport class MaterialSharedModule { }\n",
             "children": [
                 {
                     "type": "providers",
@@ -523,6 +700,26 @@
     "miscellaneous": {
         "variables": [
             {
+                "name": "autoCompleteOptions",
+                "ctype": "miscellaneous",
+                "subtype": "variable",
+                "file": "src/app/autocomplete-chips/autocomplete-chips.stories.ts",
+                "deprecated": false,
+                "deprecationMessage": "",
+                "type": "Array<AutoCompleteOption<string>>",
+                "defaultValue": "[\r\n    { id: '1', display: 'Test1', value: 'Value1' },\r\n    { id: '2', display: 'Test2', value: 'Value2' },\r\n    { id: '3', display: 'Test3', value: 'Value3' }\r\n]"
+            },
+            {
+                "name": "Default",
+                "ctype": "miscellaneous",
+                "subtype": "variable",
+                "file": "src/app/autocomplete-chips/autocomplete-chips.stories.ts",
+                "deprecated": false,
+                "deprecationMessage": "",
+                "type": "Story",
+                "defaultValue": "{\r\n  args: {\r\n    placeholder: 'Placeholder Text',\r\n    items: autoCompleteOptions\r\n  }\r\n}"
+            },
+            {
                 "name": "environment",
                 "ctype": "miscellaneous",
                 "subtype": "variable",
@@ -541,6 +738,16 @@
                 "deprecationMessage": "",
                 "type": "object",
                 "defaultValue": "{\n  production: false\n}"
+            },
+            {
+                "name": "imports",
+                "ctype": "miscellaneous",
+                "subtype": "variable",
+                "file": "src/app/autocomplete-chips/autocomplete-chips.component.cy.ts",
+                "deprecated": false,
+                "deprecationMessage": "",
+                "type": "[]",
+                "defaultValue": "[MaterialSharedModule, ReactiveFormsModule, BrowserAnimationsModule]"
             },
             {
                 "name": "Large",
@@ -629,8 +836,8 @@
                 "file": "src/app/autocomplete-chips/autocomplete-chips.stories.ts",
                 "deprecated": false,
                 "deprecationMessage": "",
-                "type": "Meta<AutocompleteChipsComponent>",
-                "defaultValue": "{\r\n  title: 'App/AutoComplete-Chips',\r\n  component: AutocompleteChipsComponent,\r\n}"
+                "type": "Meta<<string>>",
+                "defaultValue": "{\r\n  component: AutocompleteChipsComponent,\r\n  decorators: [\r\n    applicationConfig({\r\n            providers: [...provideAnimations()],\r\n\r\n          }),\r\n    moduleMetadata({\r\n      imports: [MaterialSharedModule, ReactiveFormsModule]\r\n    }),\r\n    componentWrapperDecorator((story) => `<div style=\"margin: 3em\">${story}</div>`)],\r\n}"
             },
             {
                 "name": "preview",
@@ -653,14 +860,14 @@
                 "defaultValue": "{\n  args: {\n    primary: true,\n    label: 'Button',\n  },\n}"
             },
             {
-                "name": "Primary",
+                "name": "sampleItems",
                 "ctype": "miscellaneous",
                 "subtype": "variable",
-                "file": "src/app/autocomplete-chips/autocomplete-chips.stories.ts",
+                "file": "src/app/autocomplete-chips/autocomplete-chips.component.cy.ts",
                 "deprecated": false,
                 "deprecationMessage": "",
-                "type": "Story",
-                "defaultValue": "{\r\n  render: () => ({\r\n    props: {\r\n      label: 'AutoComplete-Chips',\r\n      primary: true,\r\n    },\r\n  }),\r\n}"
+                "type": "[]",
+                "defaultValue": "[\r\n  { id: '1', display: 'Test1', value: 'Value1' },\r\n  { id: '2', display: 'Test2', value: 'Value2' },\r\n  { id: '3', display: 'Test3', value: 'Value3' }\r\n]"
             },
             {
                 "name": "Secondary",
@@ -681,9 +888,106 @@
                 "deprecationMessage": "",
                 "type": "Story",
                 "defaultValue": "{\n  args: {\n    size: 'small',\n    label: 'Button',\n  },\n}"
+            },
+            {
+                "name": "WithItemsSelected",
+                "ctype": "miscellaneous",
+                "subtype": "variable",
+                "file": "src/app/autocomplete-chips/autocomplete-chips.stories.ts",
+                "deprecated": false,
+                "deprecationMessage": "",
+                "type": "Story",
+                "defaultValue": "{\r\n  args: {\r\n    ...Primary.args,\r\n    placeholder: 'Secondary Placeholder Text'\r\n  }\r\n}"
             }
         ],
-        "functions": [],
+        "functions": [
+            {
+                "name": "customMount",
+                "file": "src/app/autocomplete-chips/autocomplete-chips.component.cy.ts",
+                "ctype": "miscellaneous",
+                "subtype": "function",
+                "deprecated": false,
+                "deprecationMessage": "",
+                "description": "",
+                "args": [
+                    {
+                        "name": "component",
+                        "deprecated": false,
+                        "deprecationMessage": ""
+                    },
+                    {
+                        "name": "config",
+                        "type": "MountConfig",
+                        "deprecated": false,
+                        "deprecationMessage": "",
+                        "optional": true
+                    }
+                ],
+                "jsdoctags": [
+                    {
+                        "name": "component",
+                        "deprecated": false,
+                        "deprecationMessage": "",
+                        "tagName": {
+                            "text": "param"
+                        }
+                    },
+                    {
+                        "name": "config",
+                        "type": "MountConfig",
+                        "deprecated": false,
+                        "deprecationMessage": "",
+                        "optional": true,
+                        "tagName": {
+                            "text": "param"
+                        }
+                    }
+                ]
+            },
+            {
+                "name": "props",
+                "file": "src/app/autocomplete-chips/autocomplete-chips.component.cy.ts",
+                "ctype": "miscellaneous",
+                "subtype": "function",
+                "deprecated": false,
+                "deprecationMessage": "",
+                "description": "",
+                "args": [
+                    {
+                        "name": "placeholder",
+                        "type": "string",
+                        "deprecated": false,
+                        "deprecationMessage": ""
+                    },
+                    {
+                        "name": "items",
+                        "deprecated": false,
+                        "deprecationMessage": "",
+                        "defaultValue": "[]"
+                    }
+                ],
+                "jsdoctags": [
+                    {
+                        "name": "placeholder",
+                        "type": "string",
+                        "deprecated": false,
+                        "deprecationMessage": "",
+                        "tagName": {
+                            "text": "param"
+                        }
+                    },
+                    {
+                        "name": "items",
+                        "deprecated": false,
+                        "deprecationMessage": "",
+                        "defaultValue": "[]",
+                        "tagName": {
+                            "text": "param"
+                        }
+                    }
+                ]
+            }
+        ],
         "typealiases": [
             {
                 "name": "Story",
@@ -722,7 +1026,7 @@
                 "name": "Story",
                 "ctype": "miscellaneous",
                 "subtype": "typealias",
-                "rawtype": "StoryObj<AutocompleteChipsComponent>",
+                "rawtype": "StoryObj<AutocompleteChipsComponent<string>>",
                 "file": "src/app/autocomplete-chips/autocomplete-chips.stories.ts",
                 "deprecated": false,
                 "deprecationMessage": "",
@@ -732,6 +1036,48 @@
         ],
         "enumerations": [],
         "groupedVariables": {
+            "src/app/autocomplete-chips/autocomplete-chips.stories.ts": [
+                {
+                    "name": "autoCompleteOptions",
+                    "ctype": "miscellaneous",
+                    "subtype": "variable",
+                    "file": "src/app/autocomplete-chips/autocomplete-chips.stories.ts",
+                    "deprecated": false,
+                    "deprecationMessage": "",
+                    "type": "Array<AutoCompleteOption<string>>",
+                    "defaultValue": "[\r\n    { id: '1', display: 'Test1', value: 'Value1' },\r\n    { id: '2', display: 'Test2', value: 'Value2' },\r\n    { id: '3', display: 'Test3', value: 'Value3' }\r\n]"
+                },
+                {
+                    "name": "Default",
+                    "ctype": "miscellaneous",
+                    "subtype": "variable",
+                    "file": "src/app/autocomplete-chips/autocomplete-chips.stories.ts",
+                    "deprecated": false,
+                    "deprecationMessage": "",
+                    "type": "Story",
+                    "defaultValue": "{\r\n  args: {\r\n    placeholder: 'Placeholder Text',\r\n    items: autoCompleteOptions\r\n  }\r\n}"
+                },
+                {
+                    "name": "meta",
+                    "ctype": "miscellaneous",
+                    "subtype": "variable",
+                    "file": "src/app/autocomplete-chips/autocomplete-chips.stories.ts",
+                    "deprecated": false,
+                    "deprecationMessage": "",
+                    "type": "Meta<<string>>",
+                    "defaultValue": "{\r\n  component: AutocompleteChipsComponent,\r\n  decorators: [\r\n    applicationConfig({\r\n            providers: [...provideAnimations()],\r\n\r\n          }),\r\n    moduleMetadata({\r\n      imports: [MaterialSharedModule, ReactiveFormsModule]\r\n    }),\r\n    componentWrapperDecorator((story) => `<div style=\"margin: 3em\">${story}</div>`)],\r\n}"
+                },
+                {
+                    "name": "WithItemsSelected",
+                    "ctype": "miscellaneous",
+                    "subtype": "variable",
+                    "file": "src/app/autocomplete-chips/autocomplete-chips.stories.ts",
+                    "deprecated": false,
+                    "deprecationMessage": "",
+                    "type": "Story",
+                    "defaultValue": "{\r\n  args: {\r\n    ...Primary.args,\r\n    placeholder: 'Secondary Placeholder Text'\r\n  }\r\n}"
+                }
+            ],
             "src/environments/environment.prod.ts": [
                 {
                     "name": "environment",
@@ -754,6 +1100,28 @@
                     "deprecationMessage": "",
                     "type": "object",
                     "defaultValue": "{\n  production: false\n}"
+                }
+            ],
+            "src/app/autocomplete-chips/autocomplete-chips.component.cy.ts": [
+                {
+                    "name": "imports",
+                    "ctype": "miscellaneous",
+                    "subtype": "variable",
+                    "file": "src/app/autocomplete-chips/autocomplete-chips.component.cy.ts",
+                    "deprecated": false,
+                    "deprecationMessage": "",
+                    "type": "[]",
+                    "defaultValue": "[MaterialSharedModule, ReactiveFormsModule, BrowserAnimationsModule]"
+                },
+                {
+                    "name": "sampleItems",
+                    "ctype": "miscellaneous",
+                    "subtype": "variable",
+                    "file": "src/app/autocomplete-chips/autocomplete-chips.component.cy.ts",
+                    "deprecated": false,
+                    "deprecationMessage": "",
+                    "type": "[]",
+                    "defaultValue": "[\r\n  { id: '1', display: 'Test1', value: 'Value1' },\r\n  { id: '2', display: 'Test2', value: 'Value2' },\r\n  { id: '3', display: 'Test3', value: 'Value3' }\r\n]"
                 }
             ],
             "src/stories/Button.stories.ts": [
@@ -872,28 +1240,6 @@
                     "defaultValue": "{\n  title: 'Example/Page',\n  component: Page,\n  parameters: {\n    // More on how to position stories at: https://storybook.js.org/docs/angular/configure/story-layout\n    layout: 'fullscreen',\n  },\n  decorators: [\n    moduleMetadata({\n      declarations: [Button, Header],\n      imports: [CommonModule],\n    }),\n  ],\n}"
                 }
             ],
-            "src/app/autocomplete-chips/autocomplete-chips.stories.ts": [
-                {
-                    "name": "meta",
-                    "ctype": "miscellaneous",
-                    "subtype": "variable",
-                    "file": "src/app/autocomplete-chips/autocomplete-chips.stories.ts",
-                    "deprecated": false,
-                    "deprecationMessage": "",
-                    "type": "Meta<AutocompleteChipsComponent>",
-                    "defaultValue": "{\r\n  title: 'App/AutoComplete-Chips',\r\n  component: AutocompleteChipsComponent,\r\n}"
-                },
-                {
-                    "name": "Primary",
-                    "ctype": "miscellaneous",
-                    "subtype": "variable",
-                    "file": "src/app/autocomplete-chips/autocomplete-chips.stories.ts",
-                    "deprecated": false,
-                    "deprecationMessage": "",
-                    "type": "Story",
-                    "defaultValue": "{\r\n  render: () => ({\r\n    props: {\r\n      label: 'AutoComplete-Chips',\r\n      primary: true,\r\n    },\r\n  }),\r\n}"
-                }
-            ],
             ".storybook/preview.ts": [
                 {
                     "name": "preview",
@@ -907,7 +1253,96 @@
                 }
             ]
         },
-        "groupedFunctions": {},
+        "groupedFunctions": {
+            "src/app/autocomplete-chips/autocomplete-chips.component.cy.ts": [
+                {
+                    "name": "customMount",
+                    "file": "src/app/autocomplete-chips/autocomplete-chips.component.cy.ts",
+                    "ctype": "miscellaneous",
+                    "subtype": "function",
+                    "deprecated": false,
+                    "deprecationMessage": "",
+                    "description": "",
+                    "args": [
+                        {
+                            "name": "component",
+                            "deprecated": false,
+                            "deprecationMessage": ""
+                        },
+                        {
+                            "name": "config",
+                            "type": "MountConfig",
+                            "deprecated": false,
+                            "deprecationMessage": "",
+                            "optional": true
+                        }
+                    ],
+                    "jsdoctags": [
+                        {
+                            "name": "component",
+                            "deprecated": false,
+                            "deprecationMessage": "",
+                            "tagName": {
+                                "text": "param"
+                            }
+                        },
+                        {
+                            "name": "config",
+                            "type": "MountConfig",
+                            "deprecated": false,
+                            "deprecationMessage": "",
+                            "optional": true,
+                            "tagName": {
+                                "text": "param"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "props",
+                    "file": "src/app/autocomplete-chips/autocomplete-chips.component.cy.ts",
+                    "ctype": "miscellaneous",
+                    "subtype": "function",
+                    "deprecated": false,
+                    "deprecationMessage": "",
+                    "description": "",
+                    "args": [
+                        {
+                            "name": "placeholder",
+                            "type": "string",
+                            "deprecated": false,
+                            "deprecationMessage": ""
+                        },
+                        {
+                            "name": "items",
+                            "deprecated": false,
+                            "deprecationMessage": "",
+                            "defaultValue": "[]"
+                        }
+                    ],
+                    "jsdoctags": [
+                        {
+                            "name": "placeholder",
+                            "type": "string",
+                            "deprecated": false,
+                            "deprecationMessage": "",
+                            "tagName": {
+                                "text": "param"
+                            }
+                        },
+                        {
+                            "name": "items",
+                            "deprecated": false,
+                            "deprecationMessage": "",
+                            "defaultValue": "[]",
+                            "tagName": {
+                                "text": "param"
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
         "groupedEnumerations": {},
         "groupedTypeAliases": {
             "src/stories/Button.stories.ts": [
@@ -954,7 +1389,7 @@
                     "name": "Story",
                     "ctype": "miscellaneous",
                     "subtype": "typealias",
-                    "rawtype": "StoryObj<AutocompleteChipsComponent>",
+                    "rawtype": "StoryObj<AutocompleteChipsComponent<string>>",
                     "file": "src/app/autocomplete-chips/autocomplete-chips.stories.ts",
                     "deprecated": false,
                     "deprecationMessage": "",
@@ -966,7 +1401,7 @@
     },
     "routes": [],
     "coverage": {
-        "count": 3,
+        "count": 2,
         "status": "low",
         "files": [
             {
@@ -989,12 +1424,90 @@
                 "status": "low"
             },
             {
+                "filePath": "src/app/autocomplete-chips/autocomplete-chips.component.cy.ts",
+                "type": "interface",
+                "linktype": "interface",
+                "name": "Chainable",
+                "coveragePercent": 0,
+                "coverageCount": "0/2",
+                "status": "low"
+            },
+            {
+                "filePath": "src/app/autocomplete-chips/autocomplete-chips.component.cy.ts",
+                "type": "function",
+                "linktype": "miscellaneous",
+                "linksubtype": "function",
+                "name": "customMount",
+                "coveragePercent": 0,
+                "coverageCount": "0/1",
+                "status": "low"
+            },
+            {
+                "filePath": "src/app/autocomplete-chips/autocomplete-chips.component.cy.ts",
+                "type": "function",
+                "linktype": "miscellaneous",
+                "linksubtype": "function",
+                "name": "props",
+                "coveragePercent": 0,
+                "coverageCount": "0/1",
+                "status": "low"
+            },
+            {
+                "filePath": "src/app/autocomplete-chips/autocomplete-chips.component.cy.ts",
+                "type": "variable",
+                "linktype": "miscellaneous",
+                "linksubtype": "variable",
+                "name": "imports",
+                "coveragePercent": 0,
+                "coverageCount": "0/1",
+                "status": "low"
+            },
+            {
+                "filePath": "src/app/autocomplete-chips/autocomplete-chips.component.cy.ts",
+                "type": "variable",
+                "linktype": "miscellaneous",
+                "linksubtype": "variable",
+                "name": "sampleItems",
+                "coveragePercent": 0,
+                "coverageCount": "0/1",
+                "status": "low"
+            },
+            {
                 "filePath": "src/app/autocomplete-chips/autocomplete-chips.component.ts",
                 "type": "component",
                 "linktype": "component",
                 "name": "AutocompleteChipsComponent",
                 "coveragePercent": 0,
-                "coverageCount": "0/3",
+                "coverageCount": "0/9",
+                "status": "low"
+            },
+            {
+                "filePath": "src/app/autocomplete-chips/autocomplete-chips.component.ts",
+                "type": "interface",
+                "linktype": "interface",
+                "name": "AutoCompleteOption",
+                "coveragePercent": 0,
+                "coverageCount": "0/4",
+                "status": "low"
+            },
+            {
+                "filePath": "src/app/autocomplete-chips/autocomplete-chips.stories.ts",
+                "type": "variable",
+                "linktype": "miscellaneous",
+                "linksubtype": "variable",
+                "name": "autoCompleteOptions",
+                "coveragePercent": 0,
+                "coverageCount": "0/1",
+                "status": "low"
+            },
+            {
+                "filePath": "src/app/autocomplete-chips/autocomplete-chips.stories.ts",
+                "type": "variable",
+                "linktype": "miscellaneous",
+                "linksubtype": "variable",
+                "name": "Default",
+                "coveragePercent": 0,
+                "coverageCount": "0/1",
                 "status": "low"
             },
             {
@@ -1012,7 +1525,7 @@
                 "type": "variable",
                 "linktype": "miscellaneous",
                 "linksubtype": "variable",
-                "name": "Primary",
+                "name": "WithItemsSelected",
                 "coveragePercent": 0,
                 "coverageCount": "0/1",
                 "status": "low"
