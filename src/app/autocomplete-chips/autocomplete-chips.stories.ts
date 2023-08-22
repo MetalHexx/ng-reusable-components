@@ -1,5 +1,5 @@
 import { Meta, Story, applicationConfig, moduleMetadata } from '@storybook/angular';
-import { BrowserAnimationsModule, provideAnimations } from '@angular/platform-browser/animations';
+import { provideAnimations } from '@angular/platform-browser/animations';
 import { AutocompleteChipsComponent } from './autocomplete-chips.component';
 import { ReactiveFormsModule } from '@angular/forms';
 import { MaterialSharedModule } from '../material-shared/material-shared.module';
