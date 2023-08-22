@@ -1,5 +1,6 @@
 import { MountConfig, createOutputSpy, mount } from "cypress/angular";
-import { AutoCompleteOption, AutocompleteChipsComponent } from "./autocomplete-chips.component";
+import { AutocompleteChipsComponent } from "./autocomplete-chips.component";
+import { AutoCompleteOption } from './AutoCompleteOption';
 import { MaterialSharedModule } from "../material-shared/material-shared.module";
 import { ReactiveFormsModule } from "@angular/forms";
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";

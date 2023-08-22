@@ -1,12 +1,7 @@
 import { Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
-
-export interface AutoCompleteOption<T> {
-  id: string,
-  display: string;
-  value: T;
-}
+import { AutoCompleteOption } from './AutoCompleteOption';
 
 @Component({
   selector: 'app-autocomplete-chips',
