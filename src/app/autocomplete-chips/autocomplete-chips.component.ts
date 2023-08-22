@@ -16,7 +16,7 @@ export interface AutoCompleteOption<T> {
 export class AutocompleteChipsComponent<T> {
 
   @Input() items: AutoCompleteOption<T>[] = [];
-  @Input() placeholder: string = "dddd";
+  @Input() placeholder: string = "";
   @Output() selectedItemsChange = new EventEmitter<AutoCompleteOption<T>[]>();
 
   @ViewChild('inputElem') inputElem!: ElementRef;

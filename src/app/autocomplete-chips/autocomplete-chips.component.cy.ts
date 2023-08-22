@@ -4,7 +4,6 @@ import { MaterialSharedModule } from "../material-shared/material-shared.module"
 import { ReactiveFormsModule } from "@angular/forms";
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 import { Type } from "@angular/core";
-import { MatIconModule } from '@angular/material/icon';
 
 declare global {
   namespace Cypress {
@@ -14,7 +13,7 @@ declare global {
   }
 }
 
-const imports = [MaterialSharedModule, ReactiveFormsModule, BrowserAnimationsModule, MatIconModule];
+const imports = [MaterialSharedModule, ReactiveFormsModule, BrowserAnimationsModule];
 
 function customMount<T>(component: string | Type<T>, config?: MountConfig<T>) {
   if (!config) {
