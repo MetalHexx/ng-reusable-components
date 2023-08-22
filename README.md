@@ -1,6 +1,6 @@
 # NgReusableComponents
 
-## Steps to create
+## Notes taken while producing the repo...Work in progress.
 
 - Run `ng new ng-reusable-components` to create new angular application
 - Run `npx storybook@latest init` to install storybook.
