@@ -30,7 +30,7 @@ function props(placeholder: string, items: AutoCompleteOption<any>[] = []) {
     componentProperties: {
       placeholder: placeholder,
       items: items,
-      selectedItemsChange: createOutputSpy('selectedItemsChange')
+      selectedItemsChanged: createOutputSpy('selectedItemsChanged')
     }
   }
 }
@@ -115,7 +115,7 @@ describe('AutoCompleteChipsComponent', () => {
     cy.get('mat-option:visible').first().click();
     cy.get('[data-testid="chip-remove"]').first().click();
 
-    cy.get('@selectedItemsChange')
+    cy.get('@selectedItemsChanged')
       .should('have.callCount', 3)
       .its('thirdCall.args.0')
       .should('deep.equal', [
@@ -129,7 +129,7 @@ describe('AutoCompleteChipsComponent', () => {
     cy.get('mat-option:visible').first().click();
     cy.get('[data-testid="autocomplete-input"]').type('Test');
     cy.get('mat-option:visible').first().click();
-    cy.get('@selectedItemsChange')
+    cy.get('@selectedItemsChanged')
       .should('have.callCount', 2)
       .its('secondCall.args.0')
       .should('deep.equal', [

@@ -8,13 +8,17 @@ import { AutoCompleteOption } from './AutoCompleteOption';
   templateUrl: './autocomplete-chips.component.html',
   styleUrls: ['./autocomplete-chips.component.scss']
 })
+
+//Auto-complete component using generics <T>
 export class AutocompleteChipsComponent<T> {
 
   @Input() items: AutoCompleteOption<T>[] = [];
   @Input() placeholder: string = "";
-  @Output() selectedItemsChange = new EventEmitter<AutoCompleteOption<T>[]>();
+  @Output() selectedItemsChanged = new EventEmitter<AutoCompleteOption<T>[]>();
 
+  //Necessary evil due to quirks in angular material
   @ViewChild('inputElem') inputElem!: ElementRef;
+
   itemCtrl = new FormControl();
   selectedItems: AutoCompleteOption<T>[] = [];
 
@@ -30,7 +34,7 @@ export class AutocompleteChipsComponent<T> {
   onSelect(event: MatAutocompleteSelectedEvent) {
     const selectedItem = event.option.value as AutoCompleteOption<T>;
     this.selectedItems.push(selectedItem);
-    this.selectedItemsChange.emit(this.selectedItems);
+    this.selectedItemsChanged.emit(this.selectedItems);
     this.itemCtrl.reset();
     this.inputElem.nativeElement.value = '';
   }
@@ -38,6 +42,6 @@ export class AutocompleteChipsComponent<T> {
   removeItem(itemValue: AutoCompleteOption<T>) {
     const index = this.selectedItems.indexOf(itemValue);
     this.selectedItems.splice(index, 1);
-    this.selectedItemsChange.emit(this.selectedItems);
+    this.selectedItemsChanged.emit(this.selectedItems);
   }
 }
