@@ -1,5 +1,9 @@
 # NgReusableComponents
 
+## To Run Demos
+- Cypress `npx cypress open`
+- Storybook `npm run storybook`
+
 ## Notes taken while producing the repo...Work in progress.
 
 - Run `ng new ng-reusable-components` to create new angular application
